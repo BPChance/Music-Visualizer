@@ -3,22 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Title</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Music Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add Spotify Web Playback SDK -->
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <style>
+        #visualizer-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>Music visualizer</h1>
-        <div class="subtitle">Experience music in a new dimension</div>
-    </header>
+<body class="bg-black overflow-hidden">
+    <div id="visualizer-container">
+        <canvas id="visualizer"></canvas>
+    </div>
 
-    <div class="mood-grid">
-        <button class="mood-button">Ambient</button>
-        <button class="mood-button">Energetic</button>
-        <button class="mood-button">Relaxing</button>
-        <button class="mood-button">Dark</button>
-        <button class="mood-button">Euphoric</button>
-        <button class="mood-button">Melancholic</button>
+    <div class="fixed inset-0 flex flex-col items-center justify-center z-10">
+        <div class="text-center mb-16">
+            <h1 class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4">
+                Music Visualizer
+            </h1>
+            <p class="text-gray-400 text-xl">Experience music in a new dimension</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6 p-6 max-w-3xl">
+            <button class="mood-button px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition duration-200 text-lg font-semibold text-white shadow-lg backdrop-blur-sm">Ambient</button>
+            <button class="mood-button px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition duration-200 text-lg font-semibold text-white shadow-lg backdrop-blur-sm">Energetic</button>
+            <button class="mood-button px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition duration-200 text-lg font-semibold text-white shadow-lg backdrop-blur-sm">Relaxing</button>
+            <button class="mood-button px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition duration-200 text-lg font-semibold text-white shadow-lg backdrop-blur-sm">Dark</button>
+            <button class="mood-button px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition duration-200 text-lg font-semibold text-white shadow-lg backdrop-blur-sm">Euphoric</button>
+            <button class="mood-button px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition duration-200 text-lg font-semibold text-white shadow-lg backdrop-blur-sm">Melancholic</button>
+        </div>
+    </div>
+
+    <div id="player-controls" class="fixed top-4 right-4 z-20">
+        <button id="play-button" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+            Loading...
+        </button>
     </div>
 
     <script src="scripts.js"></script>
