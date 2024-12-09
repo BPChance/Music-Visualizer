@@ -1,134 +1,87 @@
-// Canvas setup
+// Audio setup
+const audio = new Audio();
+audio.src = './test.mp3';
+audio.loop = true;
+audio.volume = 1.0;
+
+// Visualizer setup
 const canvas = document.getElementById('visualizer');
 const ctx = canvas.getContext('2d');
-let analyzer;
-let audioContext;
+let audioContext, analyzer, dataArray;
 
-// Spotify setup
-let token = '';
-const TRACK_ID = '7FYOAvb72KIVFO7l993ADO';
-let player;
-let isPlaying = false;
-
-// Get token from URL and clean up URL
-function getTokenFromUrl() {
-    const hash = window.location.hash
-        .substring(1)
-        .split('&')
-        .reduce((initial, item) => {
-            if (item) {
-                const parts = item.split('=');
-                initial[parts[0]] = decodeURIComponent(parts[1]);
-            }
-            return initial;
-        }, {});
-    
-    window.location.hash = '';
-    return hash.access_token;
-}
-
-// Check if we're already authenticated
-function checkAuth() {
-    const storedToken = sessionStorage.getItem('spotify_token');
-    if (storedToken) {
-        return storedToken;
-    }
-    
-    const urlToken = getTokenFromUrl();
-    if (urlToken) {
-        sessionStorage.setItem('spotify_token', urlToken);
-        return urlToken;
-    }
-    
-    return null;
-}
-
-// Initialize audio analyzer after user interaction
-async function initializeAnalyzer() {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        await audioContext.resume();
-        
-        analyzer = audioContext.createAnalyser();
-        analyzer.fftSize = 256;
-        
-        // Create a dummy source for now (we'll update this with actual audio)
-        const oscillator = audioContext.createOscillator();
-        oscillator.connect(analyzer);
-        analyzer.connect(audioContext.destination);
-        
-        // Start the visualization
-        draw();
-    }
-}
-
-// Initialize Spotify player
-function initializeSpotifyPlayer(accessToken) {
-    player = new Spotify.Player({
-        name: 'Music Visualizer',
-        getOAuthToken: cb => { cb(accessToken); },
-        volume: 0.5
-    });
-
-    // Error handling
-    player.addListener('initialization_error', ({ message }) => {
-        console.error('Initialization Error:', message);
-    });
-    player.addListener('authentication_error', ({ message }) => {
-        console.error('Authentication Error:', message);
-        sessionStorage.removeItem('spotify_token');
-        window.location.href = '/login';
-    });
-    player.addListener('account_error', ({ message }) => {
-        console.error('Account Error:', message);
-    });
-    player.addListener('playback_error', ({ message }) => {
-        console.error('Playback Error:', message);
-    });
-
-    // Playback status updates
-    player.addListener('player_state_changed', state => {
-        if (state) {
-            isPlaying = !state.paused;
-            updatePlayButton();
-        }
-    });
-
-    // Ready
-    player.addListener('ready', ({ device_id }) => {
-        console.log('Ready with Device ID', device_id);
-        startPlayback(device_id);
-    });
-
-    // Connect to the player
-    player.connect();
-}
-
-// Start playback
-async function startPlayback(deviceId) {
+// Initialize audio context and analyzer
+function initAudio() {
     try {
-        await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                uris: [`spotify:track:${TRACK_ID}`]
-            })
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyzer = audioContext.createAnalyser();
+        const source = audioContext.createMediaElementSource(audio);
+        source.connect(analyzer);
+        analyzer.connect(audioContext.destination);
+        analyzer.fftSize = 256;
+        dataArray = new Uint8Array(analyzer.frequencyBinCount);
+        
+        // Add volume control
+        const volumeControl = document.createElement('input');
+        volumeControl.type = 'range';
+        volumeControl.min = 0;
+        volumeControl.max = 1;
+        volumeControl.step = 0.1;
+        volumeControl.value = audio.volume;
+        volumeControl.className = 'fixed top-20 right-4 z-20';
+        document.body.appendChild(volumeControl);
+        
+        volumeControl.addEventListener('input', (e) => {
+            audio.volume = e.target.value;
         });
         
-        // Initialize analyzer after playback starts
-        await initializeAnalyzer();
+        // Start visualization
+        draw();
     } catch (error) {
-        console.error('Error starting playback:', error);
+        console.error('Audio initialization error:', error);
     }
 }
 
-// Update play button state
-function updatePlayButton() {
-    const playButton = document.getElementById('play-button');
-    playButton.textContent = isPlaying ? 'Pause' : 'Play';
+// Draw visualization
+function draw() {
+    requestAnimationFrame(draw);
+    analyzer.getByteFrequencyData(dataArray);
+    
+    // Clear the canvas with a fade effect
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Calculate bar width to fill the entire screen
+    const spacing = 2;
+    const barWidth = (canvas.width / dataArray.length) - spacing;
+    
+    // Center the visualization
+    const totalWidth = (barWidth + spacing) * dataArray.length;
+    const startX = (canvas.width - totalWidth) / 2;
+    
+    dataArray.forEach((frequency, index) => {
+        // Make the visualization more dramatic
+        const barHeight = (frequency * canvas.height / 256) * 0.8;
+        
+        // Calculate x position with spacing
+        const x = startX + (barWidth + spacing) * index;
+        const y = canvas.height - barHeight;
+        
+        // Create gradient
+        const gradient = ctx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
+        gradient.addColorStop(0, '#a855f7');
+        gradient.addColorStop(1, '#ec4899');
+        
+        ctx.fillStyle = gradient;
+        
+        // Add glow effect
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#a855f7';
+        
+        ctx.fillRect(x, y, barWidth, barHeight);
+    });
+    
+    // Reset shadow effect
+    ctx.shadowBlur = 0;
 }
 
 // Set canvas size
@@ -136,83 +89,44 @@ function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
-
-// Draw visualization
-function draw() {
-    requestAnimationFrame(draw);
-    
-    if (!analyzer) return;
-    
-    // Clear the canvas with a fade effect
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    const dataArray = new Uint8Array(analyzer.frequencyBinCount);
-    analyzer.getByteFrequencyData(dataArray);
-    
-    const centerX = canvas.width / 2;
-    const spacing = 2;
-    const barWidth = 4;
-    
-    // Split the frequency data into two halves
-    const halfLength = Math.floor(dataArray.length / 2);
-    
-    // Draw both sides
-    for(let i = 0; i < halfLength; i++) {
-        // Draw right side
-        const rightBarHeight = (dataArray[i + halfLength] * canvas.height / 256) * 0.8;
-        drawBar(centerX + (i * (barWidth + spacing)), rightBarHeight);
-        
-        // Draw left side
-        const leftBarHeight = (dataArray[i] * canvas.height / 256) * 0.8;
-        drawBar(centerX - ((i + 1) * (barWidth + spacing)), leftBarHeight);
-    }
-}
-
-// Draw individual bar
-function drawBar(x, height) {
-    const y = canvas.height - height;
-    
-    const gradient = ctx.createLinearGradient(0, y, 0, canvas.height);
-    gradient.addColorStop(0, '#a855f7');
-    gradient.addColorStop(1, '#ec4899');
-    
-    ctx.fillStyle = gradient;
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = '#a855f7';
-    
-    ctx.fillRect(x, y, 4, height);
-    ctx.shadowBlur = 0;
-}
-
-// Event Listeners
+resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// Play button event listener with user interaction handling
-document.getElementById('play-button').addEventListener('click', async () => {
-    if (audioContext && audioContext.state === 'suspended') {
-        await audioContext.resume();
-    }
-    if (player) {
-        player.togglePlay();
+// Create play button
+const playButton = document.createElement('button');
+playButton.textContent = 'Start Music';
+playButton.className = 'fixed top-4 right-4 px-4 py-2 bg-purple-500 text-white rounded-lg z-20 hover:bg-purple-600';
+document.body.appendChild(playButton);
+
+// Handle play button click
+playButton.addEventListener('click', async () => {
+    try {
+        if (!audioContext) {
+            initAudio();
+        }
+        
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+        }
+        
+        if (audio.paused) {
+            await audio.play();
+            playButton.textContent = 'Pause';
+        } else {
+            audio.pause();
+            playButton.textContent = 'Play';
+        }
+        
+    } catch (error) {
+        console.error('Playback error:', error);
+        playButton.textContent = 'Error - Try Again';
     }
 });
 
+// Add click event listeners to buttons
 document.querySelectorAll('.mood-button').forEach(button => {
     button.addEventListener('click', () => {
         const mood = button.textContent.toLowerCase();
         window.location.href = `${mood}.html`;
     });
 });
-
-resizeCanvas();
-
-// Initialize when Spotify SDK is ready
-window.onSpotifyWebPlaybackSDKReady = () => {
-    token = checkAuth();
-    if (token) {
-        initializeSpotifyPlayer(token);
-    } else {
-        window.location.href = '/login';
-    }
-};
