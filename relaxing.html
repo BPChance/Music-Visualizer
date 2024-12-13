@@ -5,27 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relaxing Visualizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Spotify SDK before your script -->
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <style>
-        .color-burst {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: burst 2s ease-out forwards;
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
         }
-
-        @keyframes burst {
-            0% {
-                transform: scale(0);
-                opacity: 0.8;
-            }
-            100% {
-                transform: scale(2);
-                opacity: 0;
-            }
-        }
-
+        
         #visualizer-container {
             position: fixed;
             top: 0;
@@ -39,6 +25,11 @@
             width: 100%;
             height: 100%;
         }
+        
+        .controls-overlay {
+            position: relative;
+            z-index: 10;
+        }
     </style>
 </head>
 <body class="bg-black min-h-screen">
@@ -46,25 +37,19 @@
         <canvas id="visualizer"></canvas>
     </div>
 
-    <!-- Initial Connect Button -->
-    <div id="connect-container" class="fixed top-4 right-4 z-50">
-        <button id="connect-spotify" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-            Connect Spotify
-        </button>
-    </div>
-
-    <!-- Song Input (hidden initially) -->
-    <div id="song-input" class="fixed top-4 right-4 z-50 hidden">
+    <!-- Audio Controls -->
+    <div id="audio-controls" class="fixed top-4 right-4 z-50 controls-overlay">
         <div class="flex gap-4 items-center">
             <input 
-                type="text" 
-                id="song-url" 
-                placeholder="Paste Spotify song URL"
-                class="px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700 w-80"
+                type="file" 
+                id="audio-file" 
+                accept=".wav"
+                class="px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700"
             >
             <button 
-                id="play-song" 
+                id="play-button" 
                 class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                disabled
             >
                 Play
             </button>
@@ -80,19 +65,10 @@
     </div>
 
     <!-- Track Info -->
-    <div class="fixed bottom-4 left-4 text-white z-50">
-        <div id="track-name" class="text-xl font-bold"></div>
-        <div id="artist-name" class="text-gray-400"></div>
+    <div class="fixed bottom-4 left-4 text-white z-50 controls-overlay">
+        <div id="file-name" class="text-xl font-bold"></div>
     </div>
 
-    <!-- Load your script after everything else -->
-    <script>
-        // Add event listener directly on the button
-        document.getElementById('connect-spotify').addEventListener('click', () => {
-            console.log('Connect button clicked');
-            window.location.href = '/login';
-        });
-    </script>
     <script src="relaxing.js"></script>
 </body>
 </html>
