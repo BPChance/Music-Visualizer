@@ -5,12 +5,16 @@ let audioContext, analyzer, dataArray, audioSource;
 let isPlaying = false;
 const audio = new Audio();
 
+// Add smooth transition values
+const smoothingFactor = 0.8;
+let previousData = [];
+
 // Initialize audio analyzer
 async function initializeAnalyzer() {
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyzer = audioContext.createAnalyser();
-        analyzer.fftSize = 128;
+        analyzer.fftSize = 64; // Larger bars
         dataArray = new Uint8Array(analyzer.frequencyBinCount);
         
         audioSource = audioContext.createMediaElementSource(audio);
@@ -32,31 +36,37 @@ function draw() {
     
     analyzer.getByteFrequencyData(dataArray);
     
-    // Clear canvas with fade effect
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    // Apply smoothing
+    if (previousData.length === 0) {
+        previousData = [...dataArray];
+    }
+    
+    for (let i = 0; i < dataArray.length; i++) {
+        dataArray[i] = dataArray[i] * (1 - smoothingFactor) + previousData[i] * smoothingFactor;
+        previousData[i] = dataArray[i];
+    }
+    
+    // Clear canvas with slight fade
+    ctx.fillStyle = 'rgb(0, 0, 0)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    const spacing = 2;
-    const barWidth = (canvas.width / dataArray.length) - spacing;
+    const barWidth = Math.ceil(canvas.width / dataArray.length);
+    const maxHeight = canvas.height * 1;
     
     // Draw bars from left to right
-    for(let i = 0; i < dataArray.length; i++) {
-        const barHeight = (dataArray[i] * canvas.height / 256) * 0.8;
-        const x = i * (barWidth + spacing);
-        drawBar(x, barHeight, barWidth);
-    }
-}
-
-// Draw individual bar
-function drawBar(x, height, width) {
-    const y = canvas.height - height;
-    
-    const gradient = ctx.createLinearGradient(0, y, 0, canvas.height);
-    gradient.addColorStop(0, '#a855f7');
-    gradient.addColorStop(1, '#ec4899');
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, width, height);
+    dataArray.forEach((value, i) => {
+        const height = (value * maxHeight / 256);
+        const x = i * barWidth;
+        const y = canvas.height - height;
+        
+        // Create gradient that goes from pink to purple
+        const gradient = ctx.createLinearGradient(x, y, x, canvas.height);
+        gradient.addColorStop(0, '#ec4899');
+        gradient.addColorStop(1, '#a855f7');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, barWidth - 1, height);
+    });
 }
 
 // Set canvas size

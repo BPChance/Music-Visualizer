@@ -30,6 +30,114 @@
             position: relative;
             z-index: 10;
         }
+
+        /* Gradient button styles */
+        .gradient-button {
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            transition: all 0.3s ease;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        .gradient-button:active {
+            transform: translateY(1px);
+        }
+
+        .gradient-button:disabled {
+            background: linear-gradient(45deg, #666, #888);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* File input styling */
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-button {
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        /* Volume slider styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+            height: 8px;
+        }
+
+        /* Track styles */
+        input[type="range"]::-webkit-slider-runnable-track {
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            border-radius: 4px;
+            height: 8px;
+        }
+
+        input[type="range"]::-moz-range-track {
+            background: linear-gradient(45deg, #a855f7, #ec4899);
+            border-radius: 4px;
+            height: 8px;
+        }
+
+        /* Thumb styles */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            height: 16px;
+            width: 16px;
+            margin-top: -4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            height: 16px;
+            width: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Hover effects */
+        input[type="range"]:hover::-webkit-slider-thumb {
+            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
+        }
+
+        input[type="range"]:hover::-moz-range-thumb {
+            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
+        }
     </style>
 </head>
 <body class="bg-black min-h-screen">
@@ -40,15 +148,13 @@
     <!-- Audio Controls -->
     <div id="audio-controls" class="fixed top-4 right-4 z-50 controls-overlay">
         <div class="flex gap-4 items-center">
-            <input 
-                type="file" 
-                id="audio-file" 
-                accept=".wav"
-                class="px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-700"
-            >
+            <div class="file-input-wrapper">
+                <input type="file" id="audio-file" accept=".wav" class="hidden">
+                <label for="audio-file" class="file-input-button">Choose File</label>
+            </div>
             <button 
                 id="play-button" 
-                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                class="gradient-button"
                 disabled
             >
                 Play
