@@ -2,7 +2,7 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
 const particlesArray = [];
-const numParticles = 100;
+const numParticles = 50;
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -37,10 +37,15 @@ function Particle(x, y, size, color, speed) {
     this.speed = speed;
     this.angle = Math.random() * Math.PI * 2;
 
-    this.update = (audioValue) => {
+    this.update = (audioValue, frequencyType) => {
         this.angle += this.speed;
         // scale audio for radius
         const radius = audioValue * 200;
+
+        if (frequencyType === "low") {
+            // larger size for low freq hits
+            this.size = audioValue * 10;
+        }
         this.x = canvas.width / 2 + Math.cos(this.angle) * radius;
         this.y = canvas.height / 2 + Math.sin(this.angle) * radius;
     };
@@ -51,6 +56,20 @@ function Particle(x, y, size, color, speed) {
         ctx.fillStyle = this.color;
         ctx.fill();
     };
+}
+
+function drawHighFreqParticles(highFreqArray) {
+    for (let i = 0; i < highFreqArray.length; i++) {
+        if (Math.random() > 0.5) {
+            ctx.beginPath();
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const size = highFreqArray[i] / 255 * 10;
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fillStyle = generateColor();
+            ctx.fill();
+        }
+    }
 }
 
 function generateParticles(amount) {
@@ -98,13 +117,21 @@ function start() {
         //get current audio data
         analyser.getByteFrequencyData(audioDataArray);
 
-        const maxAudioValue = Math.max(...audioDataArray) || 1;
+        //low frequencies
+        const low = audioDataArray.slice(0, audioDataArray.length / 3);
+        //mid frequencies
+        const mid = audioDataArray.slice(audioDataArray.length / 3, 2 * audioDataArray.length / 3);
+        //high frequencies
+        const high = audioDataArray.slice(2 * audioDataArray.length / 3);
 
         particlesArray.forEach((particle, i) => {
-            const audioValue = audioDataArray[i % audioDataArray.length] / 255;
-            particle.update(audioValue);
+            const audioValue = low[i % low.length] / 255;
+            particle.update(audioValue, "low");
             particle.draw();
         });
+
+        drawHighFreqParticles(mid);
+
         requestAnimationFrame(render);
     }
     render();
