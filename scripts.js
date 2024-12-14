@@ -80,7 +80,7 @@ function generateParticles(amount) {
                 canvas.height / 2,
                 4,
                 generateColor(),
-                Math.random() * 0.05
+                Math.random() * 0.02
             )
         );
     }
