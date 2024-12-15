@@ -60,29 +60,28 @@
             opacity: 0.7;
         }
 
-        /* File input styling */
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-        .file-input-wrapper input[type="file"] {
-            display: none;
-        }
-
-        .file-input-button {
+        /* Song select styling */
+        .song-select {
             background: linear-gradient(45deg, #a855f7, #ec4899);
+            border: none;
             padding: 8px 16px;
             border-radius: 8px;
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 200px;
         }
 
-        .file-input-button:hover {
+        .song-select:hover {
             opacity: 0.9;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        .song-select option {
+            background-color: #1f1f1f;
+            color: white;
+            padding: 8px;
         }
 
         /* Volume slider styling */
@@ -148,10 +147,9 @@
     <!-- Audio Controls -->
     <div id="audio-controls" class="fixed top-4 right-4 z-50 controls-overlay">
         <div class="flex gap-4 items-center">
-            <div class="file-input-wrapper">
-                <input type="file" id="audio-file" accept=".wav" class="hidden">
-                <label for="audio-file" class="file-input-button">Choose File</label>
-            </div>
+            <select id="song-select" class="song-select">
+                <option value="">Select a Song</option>
+            </select>
             <button 
                 id="play-button" 
                 class="gradient-button"

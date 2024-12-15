@@ -1,3 +1,11 @@
+const songs = [
+    {
+        title: "Alternative Outro",
+        artist: "Lucki",
+        file: "songs/Alternative Outro.wav"
+    }
+];
+
 // Canvas setup
 const canvas = document.getElementById('visualizer');
 const ctx = canvas.getContext('2d');
@@ -9,12 +17,24 @@ const audio = new Audio();
 const smoothingFactor = 0.8;
 let previousData = [];
 
+// Initialize song select dropdown
+function initializeSongSelect() {
+    const songSelect = document.getElementById('song-select');
+    
+    songs.forEach((song, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `${song.title} - ${song.artist}`;
+        songSelect.appendChild(option);
+    });
+}
+
 // Initialize audio analyzer
 async function initializeAnalyzer() {
     try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioContext = new AudioContext();
         analyzer = audioContext.createAnalyser();
-        analyzer.fftSize = 64; // Larger bars
+        analyzer.fftSize = 64;
         dataArray = new Uint8Array(analyzer.frequencyBinCount);
         
         audioSource = audioContext.createMediaElementSource(audio);
@@ -46,14 +66,14 @@ function draw() {
         previousData[i] = dataArray[i];
     }
     
-    // Clear canvas with slight fade
+    // Clear canvas with solid black
     ctx.fillStyle = 'rgb(0, 0, 0)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     const barWidth = Math.ceil(canvas.width / dataArray.length);
-    const maxHeight = canvas.height * 1;
+    const maxHeight = canvas.height * 0.8;
     
-    // Draw bars from left to right
+    // Draw bars
     dataArray.forEach((value, i) => {
         const height = (value * maxHeight / 256);
         const x = i * barWidth;
@@ -61,8 +81,8 @@ function draw() {
         
         // Create gradient that goes from pink to purple
         const gradient = ctx.createLinearGradient(x, y, x, canvas.height);
-        gradient.addColorStop(0, '#ec4899');
-        gradient.addColorStop(1, '#a855f7');
+        gradient.addColorStop(0, '#ec4899'); // Pink at top
+        gradient.addColorStop(1, '#a855f7'); // Purple at bottom
         
         ctx.fillStyle = gradient;
         ctx.fillRect(x, y, barWidth - 1, height);
@@ -75,29 +95,26 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
 }
 
-// Handle file input
+// Handle audio setup
 function setupAudioHandlers() {
-    const fileInput = document.getElementById('audio-file');
+    const songSelect = document.getElementById('song-select');
     const playButton = document.getElementById('play-button');
     const volumeControl = document.getElementById('volume');
     
-    fileInput.addEventListener('change', async function(e) {
-        const file = e.target.files[0];
-        if (file && file.type === 'audio/wav') {
-            const fileURL = URL.createObjectURL(file);
-            audio.src = fileURL;
+    songSelect.addEventListener('change', async function(e) {
+        const selectedSong = songs[this.value];
+        if (selectedSong) {
+            audio.src = selectedSong.file;
             
             if (!audioContext) {
                 await initializeAnalyzer();
             }
             
             playButton.disabled = false;
-            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-name').textContent = `${selectedSong.title} - ${selectedSong.artist}`;
         } else {
-            alert('Please select a WAV file');
-            fileInput.value = '';
-            document.getElementById('file-name').textContent = '';
             playButton.disabled = true;
+            document.getElementById('file-name').textContent = '';
         }
     });
     
@@ -132,4 +149,5 @@ function setupAudioHandlers() {
 // Initialize
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
+initializeSongSelect();
 setupAudioHandlers();
