@@ -3,6 +3,26 @@ const songs = [
         title: "Alternative Outro",
         artist: "Lucki",
         file: "songs/Alternative Outro.wav"
+    },
+    {
+        title: "Sleep Patterns",
+        artist: "Merchant Ships",
+        file: "songs/Sleep Patterns.wav"
+    },
+    {
+        title: "My Kind Of Woman",
+        artist: "Mac DeMarco",
+        file: "songs/My Kind Of Woman.wav"
+    },
+    {
+        title: "Heart To Heart",
+        artist: "Mac DeMarco",
+        file: "songs/Heart To Heart.wav"
+    },
+    {
+        title: "No Surprises",
+        artist: "Radiohead",
+        file: "songs/No Surprises.wav"
     }
 ];
 
@@ -71,7 +91,7 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     const barWidth = Math.ceil(canvas.width / dataArray.length);
-    const maxHeight = canvas.height * 0.8;
+    const maxHeight = canvas.height * 1;
     
     // Draw bars
     dataArray.forEach((value, i) => {
