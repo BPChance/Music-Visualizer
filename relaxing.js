@@ -91,7 +91,7 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     const barWidth = Math.ceil(canvas.width / dataArray.length);
-    const maxHeight = canvas.height * 1;
+    const maxHeight = canvas.height * 0.95;
     
     // Draw bars
     dataArray.forEach((value, i) => {
