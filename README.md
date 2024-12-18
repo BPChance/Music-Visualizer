@@ -11,3 +11,18 @@ The Music Visualizer is an reactive webpage that blends audio-reactive visualiza
 * HTML - Structure the web pages
 * Tailwind - Styling and responsive design
 * JavaScript - To control interactivity and visuals
+# music credits
+Relaxing page
+- Alternative Outro - Lucki
+- Sleep Patterns - Merchant Ships
+- My Kind Of Woman - Mac DeMarco
+- Heart To Heart - Mac DeMarco
+- No Surprises - Radiohead
+
+Ambient page
+- A tadpole growing up - Yours Truly, [Braden](https://github.com/BPChance)
+
+## Authors
+Braden Chance [https://github.com/BPChance]
+
+Dacoda Takagi [https://github.com/dacods]
