@@ -4,11 +4,15 @@ const ctx = canvas.getContext("2d");
 const particlesArray = [];
 const numParticles = 50;
 
+// song selector
+const songSelect = document.getElementById("song-select");
+const audio = new Audio();
+let currentSong = songSelect.value;
+
+
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    //ctx.fillStyle = "rgba(0, 0, 0, 1)";
-    //ctx.fillRect(0, 0, canvas.width, canvas.height);
     //center text
     ctx.font = "20px Arial";
     ctx.textAlign = "center";
@@ -86,6 +90,11 @@ function generateParticles(amount) {
     }
 }
 
+songSelect.addEventListener("change", (e) => {
+    currentSong = e.target.value;
+    audio.src = currentSong;
+})
+
 //initialize audio visualizer
 function start() {
     canvas.removeEventListener("click", start);
@@ -99,7 +108,7 @@ function start() {
     const audio = new Audio();
     audio.loop = true;
     audio.crossOrigin = "anonymous";
-    audio.src = "audios/A tadpole growing up.wav";
+    audio.src = currentSong;
 
     audio.addEventListener("canplay", () => {
         const source = audioContext.createMediaElementSource(audio);
