@@ -20,7 +20,9 @@ Relaxing page
 - No Surprises - Radiohead
 
 Ambient page
-- A tadpole growing up - Yours Truly, [Braden](https://github.com/BPChance)
+- A tadpole growing up - [Braden](https://github.com/BPChance) (feat. Hunter Horton)
+- Candy Thief - [Braden](https://github.com/BPChance)
+- liver and onions - My good friend Hunter, aka the Hort
 
 ## Authors
 Braden Chance [https://github.com/BPChance]
