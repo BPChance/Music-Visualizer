@@ -1,4 +1,6 @@
 # Music Visualizer
+![Uploading Screenshot 2025-04-23 at 9.34.24 AM.png…]()
+
 ## Project Overview
 The Music Visualizer is a reactive webpage that blends audio-reactive visualizations with a simple but modern user interface. This project allows users to experience music in a new dimension by immersing them in visuals that sync with the mood of the music.
 ## Features
